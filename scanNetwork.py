@@ -1,13 +1,22 @@
 import scapy.all as scapy
+import optparse
 
-arp_request_packet = scapy.ARP(pdst='192.168.101.0/24')
+opt = optparse.OptionParser()
 
-arp_brodcast_packet = scapy.Ether(dst='ff:ff:ff:ff:ff:ff')
+opt.add_option("-i","--iprange",dest="iprange",help="Enter your Ip range to scan eg. 192.168.1.0/24")
 
-combined_packet = arp_brodcast_packet / arp_request_packet
+(usrinput,arguments) = opt.parse_args()
 
-(clients,notfound) = scapy.srp(combined_packet,timeout=1)
+if not usrinput.iprange:
+    print("Please enter Ip range")
+else:
+    arp_request_packet = scapy.ARP(pdst=usrinput.iprange)
 
-for element in clients:
-    print(element[1].psrc + "      " + element[1].hwsrc)
+    arp_brodcast_packet = scapy.Ether(dst='ff:ff:ff:ff:ff:ff')
 
+    combined_packet = arp_brodcast_packet / arp_request_packet
+
+    (clients,notfound) = scapy.srp(combined_packet,timeout=1)
+
+    for element in clients:
+        print(element[1].psrc + "      " + element[1].hwsrc)
